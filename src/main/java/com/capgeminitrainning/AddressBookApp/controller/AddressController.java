@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
 @Slf4j
 @RestController
 @RequestMapping("/address")
@@ -44,7 +43,7 @@ public class AddressController {
     }
     //method to post address
     @PostMapping("/post")
-    public ResponseEntity<AddressDTO> postAddress(@RequestBody AddressDTO address){
+    public ResponseEntity<AddressDTO> postAddress(@Valid @RequestBody AddressDTO address){
         log.info("receive rest request to add new address");
         //service call to post new address
         AddressDTO addressDTO = addressService.postAddress(address);
@@ -53,7 +52,7 @@ public class AddressController {
     //method to put address
     @PutMapping("/put/{id}")
     public ResponseEntity<AddressDTO> putAddress(@PathVariable int id,
-                                                 @RequestBody AddressDTO address){
+                                                 @Valid @RequestBody AddressDTO address){
         log.info("receive rest request for update address with id {}", id);
         //service call to update address
         AddressDTO addressDTO = addressService.putAddress(id,address);
