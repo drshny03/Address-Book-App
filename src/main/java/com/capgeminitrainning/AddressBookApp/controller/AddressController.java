@@ -1,66 +1,51 @@
 package com.capgeminitrainning.AddressBookApp.controller;
 
 import com.capgeminitrainning.AddressBookApp.dto.AddressDTO;
+import com.capgeminitrainning.AddressBookApp.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/address")
 public class AddressController {
-    //map to store address
-    Map<Integer, AddressDTO> addressMap;
+    private AddressService addressService;
 
     //constructor
-    public AddressController(){
-        addressMap = new HashMap<>();
+    @Autowired
+    public AddressController(AddressService addressService){
+        this.addressService = addressService;
     }
 
     //method to get all address
     @GetMapping("/")
     public ResponseEntity<Map<Integer, AddressDTO>> getAllAddress(){
-        return ResponseEntity.ok(addressMap);
+        return addressService.getAllAddress();
     }
     //method to get address by id
     @GetMapping("/get/{id}")
     public ResponseEntity<AddressDTO> getAddressById(@PathVariable int id){
-        //check if id present
-        if(addressMap.containsKey(id)){
-            AddressDTO address = addressMap.get(id);
-            return ResponseEntity.ok(address);
-        }
-        return null;
+        return addressService.getAddressById(id);
     }
     //method to post address
     @PostMapping("/post")
     public ResponseEntity<String> postAddress(@RequestBody AddressDTO address){
-        int id = address.getId();
-        addressMap.put(id,address);
-        return ResponseEntity.ok("address stored successfully");
+        return addressService.postAddress(address);
     }
     //method to put address
     @PutMapping("/put")
     public ResponseEntity<String> putAddress(@RequestParam int id,
                                              @RequestBody AddressDTO address){
-        //check if id present
-        if(!addressMap.containsKey(id)){
-            return ResponseEntity.ok("id not found");
-        }
-        addressMap.put(id,address);
-        return ResponseEntity.ok("address updated successfully");
+        return addressService.putAddress(id,address);
     }
     //method to delete address
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteAddress(@RequestParam int id){
-        //check if id present
-        if(!addressMap.containsKey(id)){
-            return ResponseEntity.ok("id not found");
-        }
-        addressMap.remove(id);
-        return ResponseEntity.ok("address deleted successfully");
+        return addressService.deleteAddress(id);
     }
 
 }
