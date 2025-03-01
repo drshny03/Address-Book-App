@@ -7,13 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.stereotype.Component;
 
 @Component
 @Getter
@@ -29,6 +31,6 @@ public class AddressDTO {
     @NotBlank(message = "not should not be blank")
     @Email(message = "Invalid email format")
     private String email;
-    @NotBlank(message = "number should not be blank")
+    @NotNull(message = "number should not be null")
     private long number;
 }
