@@ -1,67 +1,79 @@
 package com.capgeminitrainning.AddressBookApp.service;
 
 import com.capgeminitrainning.AddressBookApp.dto.AddressDTO;
+import com.capgeminitrainning.AddressBookApp.model.AddressEntity;
+import com.capgeminitrainning.AddressBookApp.repository.AddressRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Service
 @Component
 public class AddressService {
-    //map to store address
-    Map<Integer, AddressDTO> addressMap;
-
+    AddressRepository addressRepository;
+    ModelMapper modelMapper;
     //constructor
-    public AddressService(){
-        addressMap = new HashMap<>();
+    @Autowired
+    public AddressService(AddressRepository addressRepository, ModelMapper modelMapper){
+        this.addressRepository = addressRepository;
+        this.modelMapper = modelMapper;
     }
 
     //service for get all address
-    public ResponseEntity<Map<Integer, AddressDTO>> getAllAddress() {
+    public List<AddressDTO> getAllAddress() {
         log.info("retrieving all address.....");
-        return ResponseEntity.ok(addressMap);
+        List<AddressEntity> addressEntityList = addressRepository.findAll();
+        return addressEntityList.stream()
+                .map(entity -> modelMapper.map(entity, AddressDTO.class))
+                .toList();
     }
     //service for get address by id
-    public ResponseEntity<AddressDTO> getAddressById(int id){
+    public AddressDTO getAddressById(int id){
         log.info("retrieving address for id {}" , id);
         //check if id present
-        if(addressMap.containsKey(id)){
-            AddressDTO address = addressMap.get(id);
-            return ResponseEntity.ok(address);
-        }
-        return null;
+        AddressEntity addressEntity = addressRepository.findById(id).orElseThrow(() ->
+                new IllegalArgumentException("address with id "+ id + " not found"));
+
+        return modelMapper.map(addressEntity, AddressDTO.class);
     }
     //service for update address
-    public ResponseEntity<String> putAddress(int id, AddressDTO addressDTO){
+    public AddressDTO putAddress(int id, AddressDTO addressDTO){
         log.info("updating address for id {}" , id);
         //check if id present
-        if(!addressMap.containsKey(id)){
-            return ResponseEntity.ok("id not found");
-        }
-        addressMap.put(id,addressDTO);
-        return ResponseEntity.ok("address updated successfully");
+        AddressEntity addressEntity = addressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Address with ID " + id + " not found"));
+
+        //update fields
+        addressEntity.setNumber(addressDTO.getNumber());
+        addressEntity.setEmail(addressDTO.getEmail());
+        //save updated entity
+        AddressEntity updatedAddress = addressRepository.save(addressEntity);
+        return modelMapper.map(updatedAddress, AddressDTO.class);
     }
     //service to post address
-    public ResponseEntity<String> postAddress(AddressDTO address) {
+    public AddressDTO postAddress(AddressDTO address) {
         log.info("Adding new address to address book");
-        int id = address.getId();
-        addressMap.put(id,address);
-        return ResponseEntity.ok("address stored successfully");
+        AddressEntity addressEntity = modelMapper.map(address, AddressEntity.class);
+        AddressEntity savedAddress = addressRepository.save(addressEntity);
+
+        return modelMapper.map(savedAddress, AddressDTO.class);
     }
     //service for delete address
-    public ResponseEntity<String> deleteAddress(int id) {
+    public String deleteAddress(int id) {
         log.info("deleting address for id {}" , id);
         //check if id present
-        if(!addressMap.containsKey(id)){
-            return ResponseEntity.ok("id not found");
-        }
-        addressMap.remove(id);
-        return ResponseEntity.ok("address deleted successfully");
-    }
+        AddressEntity addressEntity = addressRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Address with id " + id + " not found"));
 
+        //delete address
+        addressRepository.delete(addressEntity);
+        return "Address deleted successfully";
+    }
 }
