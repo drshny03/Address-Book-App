@@ -19,12 +19,12 @@ public class AddressService {
     private static final Logger logger = LoggerFactory.getLogger(AddressService.class);
     //map to store address
     Map<Integer, AddressDTO> addressMap;
-    private AddressDTO addressDTO;
+
 
     //constructor
     @Autowired
-    public AddressService(AddressDTO addressDTO){
-        this.addressDTO = addressDTO;
+    public AddressService(){
+
         addressMap = new HashMap<>();
     }
 
