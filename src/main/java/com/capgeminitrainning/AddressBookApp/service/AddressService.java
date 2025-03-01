@@ -1,6 +1,7 @@
 package com.capgeminitrainning.AddressBookApp.service;
 
 import com.capgeminitrainning.AddressBookApp.dto.AddressDTO;
+import com.capgeminitrainning.AddressBookApp.exception.AddressNotFoundException;
 import com.capgeminitrainning.AddressBookApp.model.AddressEntity;
 import com.capgeminitrainning.AddressBookApp.repository.AddressRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @Slf4j
 @Service
 @Component
@@ -39,7 +39,7 @@ public class AddressService {
         log.info("retrieving address for id {}" , id);
         //check if id present
         AddressEntity addressEntity = addressRepository.findById(id).orElseThrow(() ->
-                new IllegalArgumentException("address with id "+ id + " not found"));
+                new AddressNotFoundException("Address with id "+ id + " not found"));
 
         return modelMapper.map(addressEntity, AddressDTO.class);
     }
@@ -48,7 +48,7 @@ public class AddressService {
         log.info("updating address for id {}" , id);
         //check if id present
         AddressEntity addressEntity = addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Address with ID " + id + " not found"));
+                .orElseThrow(() -> new AddressNotFoundException("Address with ID " + id + " not found"));
 
         //update fields
         addressEntity.setNumber(addressDTO.getNumber());
@@ -70,7 +70,7 @@ public class AddressService {
         log.info("deleting address for id {}" , id);
         //check if id present
         AddressEntity addressEntity = addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Address with id " + id + " not found"));
+                .orElseThrow(() -> new AddressNotFoundException("Address with id " + id + " not found"));
 
         //delete address
         addressRepository.delete(addressEntity);
